@@ -1,3 +1,5 @@
 # bkit plugin runtime state (session fingerprints, token ledger, audit
 # logs, PDCA status) - regenerated locally every session, not source.
 .bkit/
+__pycache__/
+*.pyc

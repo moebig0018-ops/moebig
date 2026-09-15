@@ -1,0 +1,33 @@
+# 이미지 기반 클릭 자동화 작업 정의 파일.
+# scheduler.py --config config.yaml 로 실행.
+
+settings:
+  confidence: 0.85       # 이미지 매칭 신뢰도 (0~1). opencv 설치 시에만 적용됨.
+  dry_run: false         # true면 실제 클릭 없이 로그만 남김.
+  screenshot_on_click: true
+  log_file: automation.log
+
+tasks:
+  # 1) "watch" 모드: 화면에 이미지가 나타날 때까지 계속 폴링하다가 발견하면 클릭.
+  - name: confirm-dialog
+    mode: watch
+    image: images/confirm_button.png
+    poll_interval_sec: 2
+    click_offset: [0, 0]   # 매칭된 영역 중심 기준 (x, y) 오프셋
+    cooldown_sec: 5        # 같은 이미지 연속 클릭 방지
+    max_clicks: 0          # 0 = 무제한
+
+  # 2) "cron" 모드: 정해진 시각에 1회 실행, 이미지가 있으면 클릭.
+  - name: daily-check-in
+    mode: cron
+    at: "09:00"            # 매일 이 시각에 시도
+    image: images/checkin_button.png
+    retry:
+      attempts: 3
+      interval_sec: 10
+
+  # 3) "interval" 모드: 일정 주기마다 이미지 탐색.
+  - name: periodic-refresh
+    mode: interval
+    every_minutes: 30
+    image: images/refresh_icon.png
