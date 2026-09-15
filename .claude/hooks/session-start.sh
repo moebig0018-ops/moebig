@@ -26,3 +26,18 @@ if ! claude plugin list 2>/dev/null | grep -q "bkit@bkit-marketplace"; then
   claude plugin marketplace add popup-studio-ai/bkit-claude-code >/dev/null 2>&1 || true
   claude plugin install bkit@bkit-marketplace >/dev/null 2>&1 || true
 fi
+
+# Install the headroom plugin (context-compression startup hooks) if
+# this container doesn't already have it.
+if ! claude plugin list 2>/dev/null | grep -q "headroom@headroom-marketplace"; then
+  claude plugin marketplace add chopratejas/headroom >/dev/null 2>&1 || true
+  claude plugin install headroom@headroom-marketplace >/dev/null 2>&1 || true
+fi
+
+# Install the headroom CLI itself (the plugin's hooks only ensure a
+# durable `headroom init` deployment; they need the binary present).
+# uv keeps this isolated from system pip and avoids Debian package
+# conflicts (see PyJWT).
+if ! command -v headroom >/dev/null 2>&1 && command -v uv >/dev/null 2>&1; then
+  uv tool install --python 3.13 "headroom-ai[all]" >/tmp/headroom-install.log 2>&1 || true
+fi
