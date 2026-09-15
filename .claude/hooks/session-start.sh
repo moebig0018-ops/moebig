@@ -13,3 +13,10 @@ if ! curl -s -o /dev/null http://127.0.0.1:37700 2>/dev/null; then
   nohup npx claude-mem start >/tmp/claude-mem-worker.log 2>&1 &
   disown
 fi
+
+# Install the bkit plugin if this container doesn't already have it
+# (a fresh container has no user-scope plugin installs).
+if ! claude plugin list 2>/dev/null | grep -q "bkit@bkit-marketplace"; then
+  claude plugin marketplace add popup-studio-ai/bkit-claude-code >/dev/null 2>&1 || true
+  claude plugin install bkit@bkit-marketplace >/dev/null 2>&1 || true
+fi
